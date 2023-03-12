@@ -13,70 +13,112 @@ type Sale struct {
 	Price       float64
 }
 
+const dsn string = "root:root@tcp(localhost:3306)/goexpert"
+
+var db *gorm.DB
+var err error
+
 func main() {
-	dsn := "root:root@tcp(localhost:3306)/goexpert"
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 	db.AutoMigrate(Sale{})
+
 	// Create
-	db.Create(&Sale{
+	create(&Sale{
 		Description: "Product 01",
 		Price:       1200,
 	})
+
 	// Create Many
 	sales := []Sale{
-		{Description: "Product 02", Price: 29.90},
-		{Description: "Product 03", Price: 129.90},
-		{Description: "Product 04", Price: 229.90},
+		{Description: "Notebook dell", Price: 3929.90},
+		{Description: "MacBook Pro", Price: 9129.90},
+		{Description: "Monitor", Price: 829.90},
+		{Description: "Keyboard", Price: 29.90},
+		{Description: "Mouse", Price: 29.90},
 	}
-	db.Create(&sales)
+	createMany(&sales)
+
 	// Select One
 	var sale Sale
-	db.First(&sale, "description = ?", "Product 04")
+	findByDescription(&sale, "Monitor")
 	fmt.Println("Select One:")
 	fmt.Println(sale)
+
 	// Select All
 	var allSales []Sale
-	db.Find(&allSales)
+	findAll(&allSales)
 	fmt.Println("Select All:")
 	for _, sale := range allSales {
 		fmt.Println(sale)
 	}
-	// Select, Limit
-	db.Limit(2).Find(&allSales)
-	fmt.Println("Select Limit 2:")
-	for _, sale := range allSales {
-		fmt.Println(sale)
-	}
+
 	// Select, Limit, Offset
-	db.Limit(2).Offset(2).Find(&allSales)
+	paginate(&allSales, 2, 2)
 	fmt.Println("Select Limit 2 Offset 2:")
 	for _, sale := range allSales {
 		fmt.Println(sale)
 	}
+
 	// Select, Where
 	db.Where("price > ?", 500).Find(&allSales)
 	fmt.Println("Select Where price > 500:")
+
 	for _, sale := range allSales {
 		fmt.Println(sale)
 	}
+
 	// Select, Where, Like
-	db.Where("description LIKE ?", "%Product 03%").Find(&allSales)
-	fmt.Println("Select Where description LIKE %Product 03%:")
+	db.Where("description LIKE ?", "%Mouse%").Find(&allSales)
+	fmt.Println("Select Where description LIKE %Mouse%:")
+
 	for _, sale := range allSales {
 		fmt.Println(sale)
 	}
+
 	// Update
 	var s Sale
-	db.First(&s, 1)
-	s.Description = "New description"
-	db.Save(&s)
-	var s2 Sale
-	db.First(&s2, 1)
-	fmt.Println("Update:")
+	ID := 2
+	updateDescription(&s, ID, "New description")
+	db.First(&s, ID)
+	fmt.Println("Updated:")
 	fmt.Println(s)
+
 	// Delete
-	db.Delete(&s)
+	var s2 Sale
+	ID = 3
+	remove(&s2, ID)
+}
+
+func create(sale *Sale) {
+	db.Create(sale)
+}
+
+func createMany(sales *[]Sale) {
+	db.Create(&sales)
+}
+
+func findByDescription(sale *Sale, description string) {
+	db.First(sale, "description = ?", description)
+}
+
+func findAll(sales *[]Sale) {
+	db.Find(&sales)
+}
+
+func paginate(sales *[]Sale, limit int, offset int) {
+	db.Limit(limit).Offset(offset).Find(sales)
+}
+
+func updateDescription(sale *Sale, ID int, description string) {
+	db.First(sale, ID)
+	sale.Description = description
+	db.Save(sale)
+}
+
+func remove(sale *Sale, ID int) {
+	db.First(sale, ID)
+	db.Delete(sale)
 }
