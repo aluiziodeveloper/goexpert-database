@@ -44,4 +44,28 @@ func main() {
 	for _, sale := range allSales {
 		fmt.Println(sale)
 	}
+	// Select, Limit
+	db.Limit(2).Find(&allSales)
+	fmt.Println("Select Limit 2:")
+	for _, sale := range allSales {
+		fmt.Println(sale)
+	}
+	// Select, Limit, Offset
+	db.Limit(2).Offset(2).Find(&allSales)
+	fmt.Println("Select Limit 2 Offset 2:")
+	for _, sale := range allSales {
+		fmt.Println(sale)
+	}
+	// Select, Where
+	db.Where("price > ?", 500).Find(&allSales)
+	fmt.Println("Select Where price > 500:")
+	for _, sale := range allSales {
+		fmt.Println(sale)
+	}
+	// Select, Where, Like
+	db.Where("description LIKE ?", "%Product 03%").Find(&allSales)
+	fmt.Println("Select Where description LIKE %Product 03%:")
+	for _, sale := range allSales {
+		fmt.Println(sale)
+	}
 }
