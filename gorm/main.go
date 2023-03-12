@@ -68,4 +68,15 @@ func main() {
 	for _, sale := range allSales {
 		fmt.Println(sale)
 	}
+	// Update
+	var s Sale
+	db.First(&s, 1)
+	s.Description = "New description"
+	db.Save(&s)
+	var s2 Sale
+	db.First(&s2, 1)
+	fmt.Println("Update:")
+	fmt.Println(s)
+	// Delete
+	db.Delete(&s)
 }
