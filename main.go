@@ -8,14 +8,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type Product struct {
+type Sale struct {
 	ID    string
 	Name  string
 	Price float64
 }
 
-func NewProduct(name string, price float64) *Product {
-	return &Product{
+func NewSale(name string, price float64) *Sale {
+	return &Sale{
 		ID:    uuid.New().String(),
 		Name:  name,
 		Price: price,
@@ -29,100 +29,100 @@ func main() {
 	}
 	defer db.Close()
 	// Insert
-	product := NewProduct("Notebook", 2990.90)
-	err = insertProduct(db, *product)
+	sale := NewSale("Notebook", 2990.90)
+	err = insertSale(db, *sale)
 	if err != nil {
 		panic(err)
 	}
 	// Update
-	product.Name = "MacBook"
-	product.Price = 19099.89
-	err = updateProduct(db, product)
+	sale.Name = "MacBook"
+	sale.Price = 19099.89
+	err = updateSale(db, sale)
 	if err != nil {
 		panic(err)
 	}
 	// Select One
-	p, err := selectProduct(db, product.ID)
+	s, err := selectSale(db, sale.ID)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Produto: %v. Preço: R$ %.2f.\n", p.Name, p.Price)
+	fmt.Printf("Produto: %v. Preço: R$ %.2f.\n", s.Name, s.Price)
 	// Select All
-	products, err := selectAllProducts(db)
+	sales, err := selectAllSales(db)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("Lista de Produtos")
-	for _, p := range products {
-		fmt.Printf("Produto: %v. Preço: R$ %.2f.\n", p.Name, p.Price)
+	for _, s := range sales {
+		fmt.Printf("Produto: %v. Preço: R$ %.2f.\n", s.Name, s.Price)
 	}
 	// Delete
-	err = deleteProduct(db, product.ID)
+	err = deleteSale(db, sale.ID)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func insertProduct(db *sql.DB, product Product) error {
-	stmt, err := db.Prepare("insert into products(id, name, price) values(?, ?, ?)")
+func insertSale(db *sql.DB, sale Sale) error {
+	stmt, err := db.Prepare("insert into sales(id, name, price) values(?, ?, ?)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(product.ID, product.Name, product.Price)
+	_, err = stmt.Exec(sale.ID, sale.Name, sale.Price)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func updateProduct(db *sql.DB, product *Product) error {
-	stmt, err := db.Prepare("update products set name = ?, price = ? where id = ?")
+func updateSale(db *sql.DB, sale *Sale) error {
+	stmt, err := db.Prepare("update sales set name = ?, price = ? where id = ?")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
-	_, err = stmt.Exec(product.Name, product.Price, product.ID)
+	_, err = stmt.Exec(sale.Name, sale.Price, sale.ID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func selectProduct(db *sql.DB, id string) (*Product, error) {
-	stmt, err := db.Prepare("select id, name, price from products where id = ?")
+func selectSale(db *sql.DB, id string) (*Sale, error) {
+	stmt, err := db.Prepare("select id, name, price from sales where id = ?")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
-	var p Product
-	err = stmt.QueryRow(id).Scan(&p.ID, &p.Name, &p.Price)
+	var s Sale
+	err = stmt.QueryRow(id).Scan(&s.ID, &s.Name, &s.Price)
 	if err != nil {
 		return nil, err
 	}
-	return &p, nil
+	return &s, nil
 }
 
-func selectAllProducts(db *sql.DB) ([]Product, error) {
-	rows, err := db.Query("select id, name, price from products")
+func selectAllSales(db *sql.DB) ([]Sale, error) {
+	rows, err := db.Query("select id, name, price from sales")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var products []Product
+	var sales []Sale
 	for rows.Next() {
-		var p Product
-		err = rows.Scan(&p.ID, &p.Name, &p.Price)
+		var s Sale
+		err = rows.Scan(&s.ID, &s.Name, &s.Price)
 		if err != nil {
 			return nil, err
 		}
-		products = append(products, p)
+		sales = append(sales, s)
 	}
-	return products, nil
+	return sales, nil
 }
 
-func deleteProduct(db *sql.DB, id string) error {
-	stmt, err := db.Prepare("delete from products where id = ?")
+func deleteSale(db *sql.DB, id string) error {
+	stmt, err := db.Prepare("delete from sales where id = ?")
 	if err != nil {
 		return err
 	}

@@ -6,9 +6,9 @@ import (
 )
 
 type Sale struct {
-	ID          int `gorm:"primaryKey"`
-	Description string
-	Price       float64
+	ID    int `gorm:"primaryKey"`
+	Name  string
+	Price float64
 	gorm.Model
 }
 
@@ -26,14 +26,14 @@ func main() {
 
 	// Create
 	create(&Sale{
-		Description: "Product 01",
-		Price:       1200,
+		Name:  "Product 01",
+		Price: 1200,
 	})
 
 	// Update
 	var s Sale
 	ID := 1
-	updateDescription(&s, ID, "New description")
+	updateName(&s, ID, "New name")
 
 	// Delete
 	var s2 Sale
@@ -41,17 +41,17 @@ func main() {
 
 	// // Create Many
 	// sales := []Sale{
-	// 	{Description: "Notebook dell", Price: 3929.90},
-	// 	{Description: "MacBook Pro", Price: 9129.90},
-	// 	{Description: "Monitor", Price: 829.90},
-	// 	{Description: "Keyboard", Price: 29.90},
-	// 	{Description: "Mouse", Price: 29.90},
+	// 	{Name: "Notebook dell", Price: 3929.90},
+	// 	{Name: "MacBook Pro", Price: 9129.90},
+	// 	{Name: "Monitor", Price: 829.90},
+	// 	{Name: "Keyboard", Price: 29.90},
+	// 	{Name: "Mouse", Price: 29.90},
 	// }
 	// createMany(&sales)
 
 	// // Select One
 	// var sale Sale
-	// findByDescription(&sale, "Monitor")
+	// findByName(&sale, "Monitor")
 	// fmt.Println("Select One:")
 	// fmt.Println(sale)
 
@@ -79,8 +79,8 @@ func main() {
 	// }
 
 	// // Select, Where, Like
-	// db.Where("description LIKE ?", "%Mouse%").Find(&allSales)
-	// fmt.Println("Select Where description LIKE %Mouse%:")
+	// db.Where("name LIKE ?", "%Mouse%").Find(&allSales)
+	// fmt.Println("Select Where name LIKE %Mouse%:")
 
 	// for _, sale := range allSales {
 	// 	fmt.Println(sale)
@@ -89,7 +89,7 @@ func main() {
 	// // Update
 	// var s Sale
 	// ID := 2
-	// updateDescription(&s, ID, "New description")
+	// updateName(&s, ID, "New name")
 	// db.First(&s, ID)
 	// fmt.Println("Updated:")
 	// fmt.Println(s)
@@ -108,8 +108,8 @@ func createMany(sales *[]Sale) {
 	db.Create(&sales)
 }
 
-func findByDescription(sale *Sale, description string) {
-	db.First(sale, "description = ?", description)
+func findByName(sale *Sale, name string) {
+	db.First(sale, "name = ?", name)
 }
 
 func findAll(sales *[]Sale) {
@@ -120,9 +120,9 @@ func paginate(sales *[]Sale, limit int, offset int) {
 	db.Limit(limit).Offset(offset).Find(sales)
 }
 
-func updateDescription(sale *Sale, ID int, description string) {
+func updateName(sale *Sale, ID int, name string) {
 	db.First(sale, ID)
-	sale.Description = description
+	sale.Name = name
 	db.Save(sale)
 }
 
